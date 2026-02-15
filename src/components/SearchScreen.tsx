@@ -1,10 +1,12 @@
 import { countDocuments } from '@/rest';
-import { Button, Center, Fieldset, Group, NumberInput, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Button, Center, Fieldset, Group, Stack, Text, TextInput, Title } from '@mantine/core';
 import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import ClearButton from './ClearButton';
 import BoekjaarInput from './BoekjaarInput';
 import BedrijfsnummerInput from './BedrijfsnummerInput';
+import { BoekjaarFilter } from '@/rest/filters';
+import type { Filters as CountDocumentFilters } from '@/rest/count-documents';
 
 export default function SearchScreen(): React.ReactNode
 {
@@ -44,7 +46,7 @@ export default function SearchScreen(): React.ReactNode
 
 
     async function onRefresh(): Promise<void> {
-        const result = await countDocuments();
+        const result = await countDocuments(buildFilters());
 
         if ( result.success )
         {
@@ -57,6 +59,18 @@ export default function SearchScreen(): React.ReactNode
                 color: 'red',
             });
         }
+    }
+
+    function buildFilters(): CountDocumentFilters
+    {
+        const filters: CountDocumentFilters = {};
+
+        if ( boekjaar !== null )
+        {
+            filters.boekjaar = new BoekjaarFilter(boekjaar);
+        }
+
+        return filters;
     }
 
     function onChangeBoekjaar(value : number | null): void
