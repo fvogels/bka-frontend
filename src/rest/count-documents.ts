@@ -1,7 +1,7 @@
 import { failure, success, type Result } from "@/result";
 import { z } from 'zod';
 import axios from "axios";
-import { buildQueryParameters, type BoekjaarFilter } from "./filters";
+import { BedrijfsnummerFilter, buildQueryParameters, DocumentnummerFilter, type BoekjaarFilter } from "./filters";
 
 
 const SuccessResponse = z.object({
@@ -12,6 +12,8 @@ export type SuccessResponse = z.infer<typeof SuccessResponse>;
 
 export type Filters = Partial<{
     boekjaar: BoekjaarFilter;
+    bedrijfsnummer: BedrijfsnummerFilter;
+    documentnummer: DocumentnummerFilter;
 }>;
 
 export async function countDocuments(filters: Filters): Promise<Result<number, string>>

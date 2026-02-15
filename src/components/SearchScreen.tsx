@@ -5,7 +5,7 @@ import { useState } from "react";
 import ClearButton from './ClearButton';
 import BoekjaarInput from './BoekjaarInput';
 import BedrijfsnummerInput from './BedrijfsnummerInput';
-import { BoekjaarFilter } from '@/rest/filters';
+import { BedrijfsnummerFilter, BoekjaarFilter, DocumentnummerFilter } from '@/rest/filters';
 import type { Filters as CountDocumentFilters } from '@/rest/count-documents';
 
 export default function SearchScreen(): React.ReactNode
@@ -68,6 +68,16 @@ export default function SearchScreen(): React.ReactNode
         if ( boekjaar !== null )
         {
             filters.boekjaar = new BoekjaarFilter(boekjaar);
+        }
+
+        if ( bedrijfsnummer !== "" )
+        {
+            filters.bedrijfsnummer = new BedrijfsnummerFilter(bedrijfsnummer);
+        }
+
+        if ( minimumDocumentnummer !== "" && maximumDocumentnummer !== "" )
+        {
+            filters.documentnummer = new DocumentnummerFilter(minimumDocumentnummer, maximumDocumentnummer);
         }
 
         return filters;
