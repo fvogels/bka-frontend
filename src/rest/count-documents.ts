@@ -37,7 +37,7 @@ export async function countDocuments(filters: Filters): Promise<Result<number, s
 
 function buildUrl(filters: Filters): string
 {
-    const queryParameters = buildQueryParameters(filters);
+    const queryParameters = buildQueryParameters(filters).join("&");
 
     return `/api/v1/documents?${queryParameters}`
 }

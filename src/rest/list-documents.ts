@@ -1,7 +1,9 @@
-import { success, type Result } from "@/result";
+import { failure, success, type Result } from "@/result";
 import { z } from 'zod';
 import { Date, Time } from "./types";
 import axios from "axios";
+import { buildQueryParameters as buildFilterQueryParameters, type BedrijfsnummerFilter, type BoekjaarFilter, type DocumentnummerFilter } from "./filters";
+import type { Pagination } from "./pagination";
 
 
 export const Segment = z.object({
@@ -30,43 +32,41 @@ export const Document = z.object({
 
 export type Document = z.infer<typeof Document>;
 
+export type Filters = Partial<{
+	boekjaar: BoekjaarFilter;
+	bedrijfsnummer: BedrijfsnummerFilter;
+	documentnummer: DocumentnummerFilter;
+}>;
+
 const SuccessResponse = z.array(Document);
 
 export type SuccessResponse = z.infer<typeof SuccessResponse>;
 
+export async function listDocuments(filters: Filters, pagination: Pagination): Promise<Result<Document[], string>>
+{
+    const url = buildUrl(filters, pagination);
+    console.log(url);
 
-// export async function listDocuments(): Promise<Result<number, string>>
-// {
-//     const url = `/api/v1/documents`
+    try
+    {
+        const response = await axios.get<unknown>(url);
+        const data = SuccessResponse.parse(response.data);
 
-//     try
-//     {
-//         const response = await axios.get<unknown>(url);
-//         const data = SuccessResponse.parse(response.data);
+        return success(data);
+    }
+    catch ( exception: unknown )
+    {
+        console.error(exception);
+        return failure('Fout bij het ophalen van de gegevens')
+    }
+}
 
-//         return success(data);
-//     }
-//     catch ( exception: unknown )
-//     {
-//         console.error(exception);
-//         return convertExceptionToFailure(exception);
-//     }
+function buildUrl(filters: Filters, pagination: Pagination): string
+{
+    const filterQueryParameters = buildFilterQueryParameters(filters);
+	const paginationQueryParameters = pagination.toQueryParameter();
 
+	const queryParameters = [...filterQueryParameters, ...paginationQueryParameters].join("&");
 
-//     function buildUrl(): URL
-//     {
-//         let url = paths.items;
-
-//         if ( options.rowRange )
-//         {
-//             url = url.withRowRange(options.rowRange.start, options.rowRange.count);
-//         }
-
-//         if ( options.descriptionFilter )
-//         {
-//             url = url.withDescriptionFilter(options.descriptionFilter);
-//         }
-
-//         return url;
-//     }
-// }
+    return `/api/v1/documents?${queryParameters}`
+}

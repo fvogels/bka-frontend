@@ -20,9 +20,9 @@ export class BoekjaarFilter implements Filter
     }
 }
 
-export function buildQueryParameters(filters: FilterCollection): string
+export function buildQueryParameters(filters: FilterCollection): string[]
 {
-    return Object.values(filters).map(filter => filter?.toQueryParameter()).filter(x => x).join("&");
+    return Object.values(filters).map(filter => filter?.toQueryParameter()).filter(x => x);
 }
 
 export class BedrijfsnummerFilter implements Filter
