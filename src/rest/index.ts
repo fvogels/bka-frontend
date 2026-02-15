@@ -1,1 +1,1 @@
-export { countDocuments } from './countDocuments';
+export { countDocuments } from './count-documents';
