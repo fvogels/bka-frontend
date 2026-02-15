@@ -4,6 +4,7 @@ import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import ClearButton from './ClearButton';
 import BoekjaarInput from './BoekjaarInput';
+import BedrijfsnummerInput from './BedrijfsnummerInput';
 
 export default function SearchScreen(): React.ReactNode
 {
@@ -24,7 +25,7 @@ export default function SearchScreen(): React.ReactNode
                     <ClearButton onClick={onClearBoekjaar} />
                 </Group>
                 <Group align='flex-end'>
-                    <TextInput value={bedrijfsnummer} label="Bedrijfsnummer" style={{ flex: 1 }} onChange={e => onChangeBedrijfsnummer(e.currentTarget.value)} />
+                    <BedrijfsnummerInput value={bedrijfsnummer} style={{ flex: 1 }} onChange={onChangeBedrijfsnummer} />
                     <ClearButton onClick={onClearBedrijfsnummer} />
                 </Group>
                 <Fieldset legend="Documentnummer">

@@ -1,0 +1,15 @@
+.inactive {
+
+}
+
+.invalid {
+    input {
+        color: #FAA;
+    }
+}
+
+.valid {
+    input {
+        color: #AFA;
+    }
+}
