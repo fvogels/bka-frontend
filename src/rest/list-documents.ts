@@ -20,7 +20,7 @@ export type Segment = z.infer<typeof Segment>;
 export const Document = z.object({
     "bedrijfsnummer": z.string(),
 	"documentnummer": z.string(),
-	"boekjaar": z.date(),
+	"boekjaar": z.string(),
 	"soort": z.string(),
 	"documentdatum": Date,
 	"boekingsdatum": Date,
@@ -38,7 +38,9 @@ export type Filters = Partial<{
 	documentnummer: DocumentnummerFilter;
 }>;
 
-const SuccessResponse = z.array(Document);
+const SuccessResponse = z.object({
+	"documents": z.array(Document),
+})
 
 export type SuccessResponse = z.infer<typeof SuccessResponse>;
 
@@ -50,9 +52,10 @@ export async function listDocuments(filters: Filters, pagination: Pagination): P
     try
     {
         const response = await axios.get<unknown>(url);
+		console.log(response.data);
         const data = SuccessResponse.parse(response.data);
 
-        return success(data);
+        return success(data.documents);
     }
     catch ( exception: unknown )
     {
@@ -64,7 +67,7 @@ export async function listDocuments(filters: Filters, pagination: Pagination): P
 function buildUrl(filters: Filters, pagination: Pagination): string
 {
     const filterQueryParameters = buildFilterQueryParameters(filters);
-	const paginationQueryParameters = pagination.toQueryParameter();
+	const paginationQueryParameters = pagination.toQueryParameters();
 
 	const queryParameters = [...filterQueryParameters, ...paginationQueryParameters].join("&");
 

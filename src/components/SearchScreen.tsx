@@ -1,5 +1,5 @@
 import { countDocuments } from '@/rest';
-import { Button, Center, Fieldset, Group, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Button, Center, Fieldset, Group, Pagination, Stack, Text, TextInput, Title } from '@mantine/core';
 import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import ClearButton from './ClearButton';
@@ -7,6 +7,8 @@ import BoekjaarInput from './BoekjaarInput';
 import BedrijfsnummerInput from './BedrijfsnummerInput';
 import { BedrijfsnummerFilter, BoekjaarFilter, DocumentnummerFilter } from '@/rest/filters';
 import type { Filters as CountDocumentFilters } from '@/rest/count-documents';
+import { listDocuments, type Document } from '@/rest/list-documents';
+import { Pagination as PaginationData } from '@/rest/pagination';
 
 
 type NoSearchResults = {
@@ -18,7 +20,15 @@ type CountSearchResults = {
     count: number;
 }
 
-type SearchResults = NoSearchResults | CountSearchResults;
+type ListSearchResults = {
+    tag: 'list',
+    count: number,
+    page: number,
+    documentsPerPage: number,
+    documentsOnPage: Document[],
+}
+
+type SearchResults = NoSearchResults | CountSearchResults | ListSearchResults;
 
 
 export default function SearchScreen(): React.ReactNode
@@ -50,14 +60,15 @@ export default function SearchScreen(): React.ReactNode
                         <ClearButton onClick={onClearDocumentnummer} />
                     </Group>
                 </Fieldset>
-                <Button onClick={onRefresh}>Zoek</Button>
+                <Button onClick={onFetchCount}>Zoek</Button>
                 {renderSearchResults()}
             </Stack>
         </Center>
     );
 
 
-    function renderSearchResults(): React.ReactNode
+    // ReactElement disallows undefined, forcing the switch to be exhaustive
+    function renderSearchResults(): React.ReactElement
     {
         switch ( searchResults.tag )
         {
@@ -66,23 +77,26 @@ export default function SearchScreen(): React.ReactNode
 
             case 'count':
                 return renderCountSearchResults(searchResults);
+
+            case 'list':
+                return renderListSearchResults(searchResults);
         }
     }
 
-    function renderNoSearchResults(): React.ReactNode
+    function renderNoSearchResults(): React.ReactElement
     {
         return <></>;
     }
 
-    function renderCountSearchResults(searchResult: CountSearchResults): React.ReactNode
+    function renderCountSearchResults(searchResults: CountSearchResults): React.ReactElement
     {
         return (
-            <Fieldset legend="Zoekresultaat" mt='xl'>
+            <Fieldset legend="Zoekresultaten" mt='xl'>
                 <Stack>
                     <Center>
-                        <Text>{searchResult.count} documenten gevonden</Text>
+                        <Text>{searchResults.count} documenten gevonden</Text>
                     </Center>
-                    <Button>
+                    <Button onClick={async () => onFetchDetails(searchResults.count)}>
                         Toon details
                     </Button>
                 </Stack>
@@ -90,7 +104,33 @@ export default function SearchScreen(): React.ReactNode
         );
     }
 
-    async function onRefresh(): Promise<void> {
+    function renderListSearchResults(searchResults: ListSearchResults): React.ReactElement
+    {
+        const totalPages = Math.ceil(searchResults.count / searchResults.documentsPerPage);
+
+        return (
+            <Fieldset legend="Zoekresultaten" mt='xl'>
+                <Stack w='100%'>
+                    <Center>
+                        <Pagination total={totalPages} value={searchResults.page + 1} onChange={setPage} />
+                    </Center>
+                </Stack>
+            </Fieldset>
+        );
+
+
+        function setPage(oneBasedIndexedPage: number): void
+        {
+            setSearchResults(
+                {
+                    ...searchResults,
+                    page: oneBasedIndexedPage - 1,
+                }
+            );
+        }
+    }
+
+    async function onFetchCount(): Promise<void> {
         const result = await countDocuments(buildFilters());
 
         if ( result.success )
@@ -105,6 +145,22 @@ export default function SearchScreen(): React.ReactNode
             notifications.show({
                 message: 'Fout opgetreden',
                 color: 'red',
+            });
+        }
+    }
+
+    async function onFetchDetails(count: number): Promise<void> {
+        const pagination = new PaginationData(10, 0);
+        const result = await listDocuments(buildFilters(), pagination);
+
+        if ( result.success )
+        {
+            setSearchResults({
+                tag: 'list',
+                count,
+                page: 0,
+                documentsPerPage: 10,
+                documentsOnPage: result.value,
             });
         }
     }

@@ -9,8 +9,8 @@ export class Pagination
         this.#offset = offset;
     }
 
-    toQueryParameter(): string
+    toQueryParameters(): string[]
     {
-        return `limit=${this.#limit}&offset=${this.#offset}`;
+        return [`limit=${this.#limit}`, `offset=${this.#offset}`];
     }
 }
