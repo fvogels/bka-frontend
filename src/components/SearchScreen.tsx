@@ -269,36 +269,48 @@ export default function SearchScreen(): React.ReactNode
     function onChangeBoekjaar(value : number | null): void
     {
         setBoekjaar(value);
+        clearResults();
     }
 
     function onClearBoekjaar(): void
     {
         setBoekjaar(null);
+        clearResults();
     }
 
     function onClearBedrijfsnummer(): void
     {
         setBedrijfsnummer('');
+        clearResults();
     }
 
     function onClearDocumentnummer(): void
     {
         setMinimumdocumentnummer('');
         setMaximumdocumentnummer('');
+        clearResults();
     }
 
     function onChangeBedrijfsnummer(bedrijfsnummer: string): void
     {
         setBedrijfsnummer(bedrijfsnummer);
+        clearResults();
     }
 
     function onChangeMinimumDocumentNummer(bedrijfsnummer: string): void
     {
         setMinimumdocumentnummer(bedrijfsnummer);
+        clearResults();
     }
 
     function onChangeMaximumDocumentNummer(bedrijfsnummer: string): void
     {
         setMaximumdocumentnummer(bedrijfsnummer);
+        clearResults();
+    }
+
+    function clearResults(): void
+    {
+        setSearchResults({tag: 'noResults'});
     }
 }
