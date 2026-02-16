@@ -26,7 +26,6 @@ type ListSearchResults = {
     tag: 'list',
     count: number,
     page: number,
-    documentsPerPage: number,
     documentsOnPage: Document[],
 }
 
@@ -35,6 +34,7 @@ type SearchResults = NoSearchResults | CountSearchResults | ListSearchResults;
 
 export default function SearchScreen(): React.ReactNode
 {
+    const documentsPerPage = 10;
     const [searchResults, setSearchResults] = useState<SearchResults>({tag: 'noResults'});
     const [boekjaar, setBoekjaar] = useState<number | null>(null);
     const [bedrijfsnummer, setBedrijfsnummer] = useState<string>('');
@@ -100,7 +100,7 @@ export default function SearchScreen(): React.ReactNode
                     <Center>
                         <Text>{searchResults.count} documenten gevonden</Text>
                     </Center>
-                    <Button onClick={async () => onFetchDetails(searchResults.count)}>
+                    <Button onClick={async () => onFetchDetails(searchResults.count, 0)}>
                         Toon details
                     </Button>
                 </Stack>
@@ -110,7 +110,7 @@ export default function SearchScreen(): React.ReactNode
 
     function renderListSearchResults(searchResults: ListSearchResults): React.ReactElement
     {
-        const totalPages = Math.ceil(searchResults.count / searchResults.documentsPerPage);
+        const totalPages = Math.ceil(searchResults.count / documentsPerPage);
 
         return (
             <Fieldset legend="Zoekresultaten" mt='xl' w='800px'>
@@ -234,8 +234,8 @@ export default function SearchScreen(): React.ReactNode
         }
     }
 
-    async function onFetchDetails(count: number): Promise<void> {
-        const pagination = new PaginationData(10, 0);
+    async function onFetchDetails(count: number, page: number): Promise<void> {
+        const pagination = new PaginationData(10, documentsPerPage * page);
         const result = await listDocuments(buildFilters(), pagination);
 
         if ( result.success )
@@ -244,7 +244,6 @@ export default function SearchScreen(): React.ReactNode
                 tag: 'list',
                 count,
                 page: 0,
-                documentsPerPage: 10,
                 documentsOnPage: result.value,
             });
         }
