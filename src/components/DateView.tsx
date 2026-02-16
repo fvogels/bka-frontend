@@ -1,16 +1,19 @@
-interface Props
+import { Text, type TextProps } from "@mantine/core";
+import { forwardRef } from "react";
+
+
+interface Props extends TextProps
 {
     year: number;
     month: number;
     day: number;
 }
 
-export default function DateView(props: Props): React.ReactElement
-{
+export const DateView = forwardRef<HTMLInputElement, Props>(({year, month, day, ...remainingProps}, ref) => {
     return (
-        <>
-            {padNumber(props.day, 2)}/{padNumber(props.month, 2)}/{padNumber(props.year, 4)}
-        </>
+        <Text ref={ref} {...remainingProps}>
+            {padNumber(day, 2)}/{padNumber(month, 2)}/{padNumber(year, 4)}
+        </Text>
     );
 
 
@@ -18,4 +21,6 @@ export default function DateView(props: Props): React.ReactElement
     {
         return `${n}`.padStart(padding, '0');
     }
-}
+});
+
+export default DateView;
