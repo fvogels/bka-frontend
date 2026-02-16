@@ -9,6 +9,8 @@ import { BedrijfsnummerFilter, BoekjaarFilter, DocumentnummerFilter } from '@/re
 import type { Filters as CountDocumentFilters } from '@/rest/count-documents';
 import { listDocuments, type Document } from '@/rest/list-documents';
 import { Pagination as PaginationData } from '@/rest/pagination';
+import { DataTable } from 'mantine-datatable';
+import DateView from './DateView';
 
 
 type NoSearchResults = {
@@ -41,26 +43,28 @@ export default function SearchScreen(): React.ReactNode
 
     return (
         <Center m='xl'>
-            <Stack w='500px'>
-                <Title mb='xl'>
-                    iBoekhoudingAssistent
-                </Title>
-                <Group align='flex-end'>
-                    <BoekjaarInput value={boekjaar} onChange={onChangeBoekjaar} style={{ flex: 1 }} />
-                    <ClearButton onClick={onClearBoekjaar} />
-                </Group>
-                <Group align='flex-end'>
-                    <BedrijfsnummerInput value={bedrijfsnummer} style={{ flex: 1 }} onChange={onChangeBedrijfsnummer} />
-                    <ClearButton onClick={onClearBedrijfsnummer} />
-                </Group>
-                <Fieldset legend="Documentnummer">
-                    <Group justify='center' align='flex-end'>
-                        <TextInput value={minimumDocumentnummer} label="Minimum" onChange={e => onChangeMinimumDocumentNummer(e.currentTarget.value)} />
-                        <TextInput value={maximumDocumentnummer} label="Maximum" onChange={e => onChangeMaximumDocumentNummer(e.currentTarget.value)} />
-                        <ClearButton onClick={onClearDocumentnummer} />
+            <Stack align='center'>
+                <Stack w='500px'>
+                    <Title mb='xl'>
+                        iBoekhoudingAssistent
+                    </Title>
+                    <Group align='flex-end'>
+                        <BoekjaarInput value={boekjaar} onChange={onChangeBoekjaar} style={{ flex: 1 }} />
+                        <ClearButton onClick={onClearBoekjaar} />
                     </Group>
-                </Fieldset>
-                <Button onClick={onFetchCount}>Zoek</Button>
+                    <Group align='flex-end'>
+                        <BedrijfsnummerInput value={bedrijfsnummer} style={{ flex: 1 }} onChange={onChangeBedrijfsnummer} />
+                        <ClearButton onClick={onClearBedrijfsnummer} />
+                    </Group>
+                    <Fieldset legend="Documentnummer">
+                        <Group justify='center' align='flex-end'>
+                            <TextInput value={minimumDocumentnummer} label="Minimum" onChange={e => onChangeMinimumDocumentNummer(e.currentTarget.value)} />
+                            <TextInput value={maximumDocumentnummer} label="Maximum" onChange={e => onChangeMaximumDocumentNummer(e.currentTarget.value)} />
+                            <ClearButton onClick={onClearDocumentnummer} />
+                        </Group>
+                    </Fieldset>
+                    <Button onClick={onFetchCount}>Zoek</Button>
+                </Stack>
                 {renderSearchResults()}
             </Stack>
         </Center>
@@ -109,11 +113,38 @@ export default function SearchScreen(): React.ReactNode
         const totalPages = Math.ceil(searchResults.count / searchResults.documentsPerPage);
 
         return (
-            <Fieldset legend="Zoekresultaten" mt='xl'>
+            <Fieldset legend="Zoekresultaten" mt='xl' w='800px'>
                 <Stack w='100%'>
                     <Center>
                         <Pagination total={totalPages} value={searchResults.page + 1} onChange={setPage} />
                     </Center>
+                    <DataTable
+                        records={searchResults.documentsOnPage}
+                        columns={[
+                        {
+                            accessor: 'bedrijfsnummer',
+                            title: 'Bedrijf',
+                        },
+                        {
+                            accessor: 'boekjaar',
+                            title: 'Boekjaar',
+                        },
+                        {
+                            accessor: 'documentnummer',
+                            title: 'Nummer',
+                        },
+                        {
+                            accessor: 'soort',
+                            title: 'Soort',
+                        },
+                        {
+                            accessor: 'documentdatum',
+                            title: 'Datum',
+                            render: (row) => (
+                                <DateView year={row.documentdatum.year} month={row.documentdatum.month} day={row.documentdatum.day} />
+                            ),
+                        },
+                    ]} />
                 </Stack>
             </Fieldset>
         );
