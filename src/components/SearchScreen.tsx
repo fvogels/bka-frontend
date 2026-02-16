@@ -116,7 +116,7 @@ export default function SearchScreen(): React.ReactNode
             <Fieldset legend="Zoekresultaten" mt='xl' w='800px'>
                 <Stack w='100%'>
                     <Center>
-                        <Pagination total={totalPages} value={searchResults.page + 1} onChange={setPage} />
+                        <Pagination total={totalPages} value={searchResults.page + 1} onChange={onChangePage} />
                     </Center>
                     <DataTable
                         records={searchResults.documentsOnPage}
@@ -204,14 +204,9 @@ export default function SearchScreen(): React.ReactNode
         );
 
 
-        function setPage(oneBasedIndexedPage: number): void
+        async function onChangePage(oneBasedIndexedPage: number): Promise<void>
         {
-            setSearchResults(
-                {
-                    ...searchResults,
-                    page: oneBasedIndexedPage - 1,
-                }
-            );
+            await onFetchDetails(searchResults.count, oneBasedIndexedPage-1);
         }
     }
 
@@ -243,7 +238,7 @@ export default function SearchScreen(): React.ReactNode
             setSearchResults({
                 tag: 'list',
                 count,
-                page: 0,
+                page: page,
                 documentsOnPage: result.value,
             });
         }
