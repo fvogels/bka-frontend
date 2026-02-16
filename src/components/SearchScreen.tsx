@@ -8,9 +8,22 @@ import BedrijfsnummerInput from './BedrijfsnummerInput';
 import { BedrijfsnummerFilter, BoekjaarFilter, DocumentnummerFilter } from '@/rest/filters';
 import type { Filters as CountDocumentFilters } from '@/rest/count-documents';
 
+
+type NoSearchResults = {
+    tag: 'noResults',
+}
+
+type CountResults = {
+    tag: 'count',
+    count: number;
+}
+
+type SearchResults = NoSearchResults | CountResults;
+
+
 export default function SearchScreen(): React.ReactNode
 {
-    const [documentCount, setDocumentCount] = useState<number>(0);
+    const [searchResults, setSearchResults] = useState<SearchResults>({tag: 'noResults'});
     const [boekjaar, setBoekjaar] = useState<number | null>(null);
     const [bedrijfsnummer, setBedrijfsnummer] = useState<string>('');
     const [minimumDocumentnummer, setMinimumdocumentnummer] = useState<string>('');
@@ -37,20 +50,55 @@ export default function SearchScreen(): React.ReactNode
                         <ClearButton onClick={onClearDocumentnummer} />
                     </Group>
                 </Fieldset>
-
                 <Button onClick={onRefresh}>Zoek</Button>
-                <Text>{documentCount} gevonden</Text>
+                {renderSearchResults()}
             </Stack>
         </Center>
     );
 
+
+    function renderSearchResults(): React.ReactNode
+    {
+        switch ( searchResults.tag )
+        {
+            case 'noResults':
+                return renderNoSearchResults();
+
+            case 'count':
+                return renderCountSearchResults(searchResults);
+        }
+    }
+
+    function renderNoSearchResults(): React.ReactNode
+    {
+        return <></>;
+    }
+
+    function renderCountSearchResults(searchResult: CountResults): React.ReactNode
+    {
+        return (
+            <Fieldset legend="Zoekresultaat" mt='xl'>
+                <Stack>
+                    <Center>
+                        <Text>{searchResult.count} documenten gevonden</Text>
+                    </Center>
+                    <Button>
+                        Toon details
+                    </Button>
+                </Stack>
+            </Fieldset>
+        );
+    }
 
     async function onRefresh(): Promise<void> {
         const result = await countDocuments(buildFilters());
 
         if ( result.success )
         {
-            setDocumentCount(result.value);
+            setSearchResults({
+                tag: 'count',
+                count: result.value,
+            });
         }
         else
         {
