@@ -1,5 +1,5 @@
 import { countDocuments } from '@/rest';
-import { Button, Center, Fieldset, Group, Pagination, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Button, Center, Fieldset, Group, Pagination, Stack, Text, TextInput, Title, Tooltip } from '@mantine/core';
 import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import ClearButton from './ClearButton';
@@ -120,7 +120,7 @@ export default function SearchScreen(): React.ReactNode
                     </Center>
                     <DataTable
                         records={searchResults.documentsOnPage}
-                        verticalSpacing='0px'
+                        verticalSpacing='0'
                         columns={[
                             {
                                 accessor: 'bedrijfsnummer',
@@ -153,29 +153,44 @@ export default function SearchScreen(): React.ReactNode
                             content: ({record: document}) => {
                                 return (
                                     <DataTable
-                                        ml='2em'
+                                        align='right'
                                         mb='1em'
+                                        ml='10%'
                                         records={document.segmenten}
                                         withRowBorders={false}
                                         verticalSpacing='2px'
                                         noHeader
+                                        rowBorderColor="black"
                                         columns={[
                                             {
                                                 accessor: 'regelnummer',
                                                 title: 'Regelnummer',
                                                 render: segment => {
-                                                    return <Text>#{segment.regelnummer}</Text>
+                                                    return (
+                                                        <Tooltip label="Regelnummer">
+                                                            <Text style={{fontSize: '80%'}}>#{segment.regelnummer}</Text>
+                                                        </Tooltip>
+                                                    );
                                                 }
                                             },
                                             {
                                                 accessor: 'boekingssleutel',
                                                 title: 'Boekingssleutel',
+                                                render: segment => {
+                                                    return (
+                                                        <Tooltip label="Boekingssleutel">
+                                                            <Text style={{fontSize: '80%'}}>{segment.boekingssleutel}</Text>
+                                                        </Tooltip>
+                                                    );
+                                                }
                                             },
                                             {
                                                 accessor: 'vereffeningsdatum',
                                                 title: 'Vereffeningsdatum',
                                                 render: segment => (
-                                                    <DateView year={segment.vereffeningsdatum.year} month={segment.vereffeningsdatum.month} day={segment.vereffeningsdatum.day} />
+                                                    <Tooltip label="Vereffeningsdatum">
+                                                        <DateView year={segment.vereffeningsdatum.year} month={segment.vereffeningsdatum.month} day={segment.vereffeningsdatum.day} style={{fontSize: '80%'}} />
+                                                    </Tooltip>
                                                 ),
                                             },
                                         ]}
