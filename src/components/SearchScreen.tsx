@@ -120,31 +120,70 @@ export default function SearchScreen(): React.ReactNode
                     </Center>
                     <DataTable
                         records={searchResults.documentsOnPage}
+                        verticalSpacing='0px'
                         columns={[
-                        {
-                            accessor: 'bedrijfsnummer',
-                            title: 'Bedrijf',
-                        },
-                        {
-                            accessor: 'boekjaar',
-                            title: 'Boekjaar',
-                        },
-                        {
-                            accessor: 'documentnummer',
-                            title: 'Nummer',
-                        },
-                        {
-                            accessor: 'soort',
-                            title: 'Soort',
-                        },
-                        {
-                            accessor: 'documentdatum',
-                            title: 'Datum',
-                            render: (row) => (
-                                <DateView year={row.documentdatum.year} month={row.documentdatum.month} day={row.documentdatum.day} />
-                            ),
-                        },
-                    ]} />
+                            {
+                                accessor: 'bedrijfsnummer',
+                                title: 'Bedrijf',
+                            },
+                            {
+                                accessor: 'boekjaar',
+                                title: 'Boekjaar',
+                            },
+                            {
+                                accessor: 'documentnummer',
+                                title: 'Nummer',
+                            },
+                            {
+                                accessor: 'soort',
+                                title: 'Soort',
+                            },
+                            {
+                                accessor: 'documentdatum',
+                                title: 'Datum',
+                                render: (document) => (
+                                    <DateView year={document.documentdatum.year} month={document.documentdatum.month} day={document.documentdatum.day} />
+                                ),
+                            },
+                        ]}
+                        rowExpansion={{
+                            allowMultiple: true,
+                            initiallyExpanded: () => true,
+                            trigger: 'always',
+                            content: ({record: document}) => {
+                                return (
+                                    <DataTable
+                                        ml='2em'
+                                        mb='1em'
+                                        records={document.segmenten}
+                                        withRowBorders={false}
+                                        verticalSpacing='2px'
+                                        noHeader
+                                        columns={[
+                                            {
+                                                accessor: 'regelnummer',
+                                                title: 'Regelnummer',
+                                                render: segment => {
+                                                    return <Text>#{segment.regelnummer}</Text>
+                                                }
+                                            },
+                                            {
+                                                accessor: 'boekingssleutel',
+                                                title: 'Boekingssleutel',
+                                            },
+                                            {
+                                                accessor: 'vereffeningsdatum',
+                                                title: 'Vereffeningsdatum',
+                                                render: segment => (
+                                                    <DateView year={segment.vereffeningsdatum.year} month={segment.vereffeningsdatum.month} day={segment.vereffeningsdatum.day} />
+                                                ),
+                                            },
+                                        ]}
+                                    />
+                                );
+                            },
+                        }}
+                        />
                 </Stack>
             </Fieldset>
         );
