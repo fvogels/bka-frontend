@@ -13,12 +13,12 @@ type NoSearchResults = {
     tag: 'noResults',
 }
 
-type CountResults = {
+type CountSearchResults = {
     tag: 'count',
     count: number;
 }
 
-type SearchResults = NoSearchResults | CountResults;
+type SearchResults = NoSearchResults | CountSearchResults;
 
 
 export default function SearchScreen(): React.ReactNode
@@ -74,7 +74,7 @@ export default function SearchScreen(): React.ReactNode
         return <></>;
     }
 
-    function renderCountSearchResults(searchResult: CountResults): React.ReactNode
+    function renderCountSearchResults(searchResult: CountSearchResults): React.ReactNode
     {
         return (
             <Fieldset legend="Zoekresultaat" mt='xl'>
